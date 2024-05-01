@@ -61,19 +61,50 @@ export const dumpTransforms: { [k: keyof typeof inputs]: InputSerializer } = {
     households_flexibility_p2p_electricity_market_penetration: value,
   }),
   insulation: (key, index) => {
-    // The insulation slider maps 0 to no growth, 1 to linear, and 2 to exponential growth. Each
-    // value is included in an array in order.
+    // The insulation slider maps 0 to no growth, 1 to linear, and 2 to exponential growth.
+    // These are default values from the ETM in kWh/m2/year.
     const values = {
-      households_insulation_level_apartments: [0, 2.15, 2.4],
-      households_insulation_level_corner_houses: [0, 7.17, 11.23],
-      households_insulation_level_detached_houses: [0, 2.01, 2.16],
-      households_insulation_level_semi_detached_houses: [0, 0.19, 0.18],
-      households_insulation_level_terraced_houses: [0, 4.76, 6.13],
-      buildings_insulation_level: [0, 4.71, 6.11],
+      "households_insulation_level_apartments_1945_1964": 109,
+      "households_insulation_level_apartments_1965_1984": 95,
+      "households_insulation_level_apartments_1985_2004": 67,
+      "households_insulation_level_apartments_2005_present": 46,
+      "households_insulation_level_apartments_before_1945": 119,
+      "households_insulation_level_apartments_future": 46,
+      "households_insulation_level_detached_houses_1945_1964": 190,
+      "households_insulation_level_detached_houses_1965_1984": 164,
+      "households_insulation_level_detached_houses_1985_2004": 108,
+      "households_insulation_level_detached_houses_2005_present": 73,
+      "households_insulation_level_detached_houses_before_1945": 210,
+      "households_insulation_level_detached_houses_future": 73,
+      // Semi-detached houses seem absent in EU ETM scenario's
+      "households_insulation_level_semi_detached_houses_1945_1964": 217,
+      "households_insulation_level_semi_detached_houses_1965_1984": 187,
+      "households_insulation_level_semi_detached_houses_1985_2004": 154,
+      "households_insulation_level_semi_detached_houses_2005_present": 114,
+      "households_insulation_level_semi_detached_houses_before_1945": 269,
+      "households_insulation_level_semi_detached_houses_future": 55.0,
+      "households_insulation_level_terraced_houses_1945_1964": 140,
+      "households_insulation_level_terraced_houses_1965_1984": 124,
+      "households_insulation_level_terraced_houses_1985_2004": 84,
+      "households_insulation_level_terraced_houses_2005_present": 60,
+      "households_insulation_level_terraced_houses_before_1945": 155,
+      "households_insulation_level_terraced_houses_future": 60,
+      "buildings_insulation_level_buildings_present": 68,
+      "buildings_insulation_level_buildings_future":  68
     };
 
     return Object.entries(values).reduce((acc, [k, v]) => {
-      acc[k] = v[index];
+      let factor = 1
+      if (index == 0) {
+        factor = 1
+      } else if (index == 1) {
+        factor = .9
+      } else if (index == 2) {
+        factor = .8
+      } else {
+        console.error(`Invalid index for insulation slider: ${index}`)
+      }
+      acc[k] = Math.max(25, v * factor)
       return acc;
     }, {} as Record<string, number>);
   },
@@ -95,10 +126,10 @@ export const dumpTransforms: { [k: keyof typeof inputs]: InputSerializer } = {
    * Other
    */
   rooftop_pv_households: (key, value) => ({
-    households_solar_pv_solar_radiation_market_penetration: value,
+    capacity_of_households_solar_pv_solar_radiation: value,
   }),
   rooftop_pv_buildings: (key, value) => ({
-    buildings_solar_pv_solar_radiation_market_penetration: value,
+    capacity_of_buildings_solar_pv_solar_radiation: value,
   }),
   large_scale_storage_batteries: (key, value) => ({
     capacity_of_energy_flexibility_mv_batteries_electricity: value,
@@ -175,8 +206,8 @@ export const formatTransforms: {
   coal_power_plant_capacity_lignite: formatPercentage,
   lng_imports: formatBcm,
   renewable_energy_capacity: formatMW,
-  rooftop_pv_households: formatPercentage,
-  rooftop_pv_buildings: formatPercentage,
+  rooftop_pv_households: formatMW,
+  rooftop_pv_buildings: formatMW,
   insulation: formatInsulation,
   growth_of_installed_heat_pumps: formatPercentage,
   thermostat_settings_percentage: formatPercentage,

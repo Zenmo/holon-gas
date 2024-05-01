@@ -224,16 +224,16 @@ const inputs: { [k: string]: Input } = {
   },
   // Other
   rooftop_pv_households: {
-    value: 7.6,
-    max: 10.6,
-    min: 7.6,
-    step: 0.01,
+    value: 18_100,
+    max: 25_200,
+    min: 18_100,
+    step: 100,
     name: "Homes",
   },
   rooftop_pv_buildings: {
-    value: 6.3,
-    max: 10,
-    min: 6.3,
+    value: 18.1,
+    max: 28.7,
+    min: 18.1,
     step: 0.01,
     name: "Businesses",
   },
