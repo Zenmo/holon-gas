@@ -11,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@azure/static-web-apps-cli": "^1.1.7",
     "@fontsource/inter": "^4.5.11",
     "@headlessui/react": "^1.6.1",
     "@reduxjs/toolkit": "^1.8.1",
